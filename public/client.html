@@ -25,9 +25,8 @@
         let connectToServer = (serverUrl)=>{
           console.log("connecting to -> ", serverUrl)
           var ws = new WebSocket(serverUrl);
-          var msg = "hi, this is simple message.";
           ws.onopen = function(evt) {
-            ws.send(msg);
+            // ws.send(msg);
           };
 
           ws.onmessage = function(evt) {
