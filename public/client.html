@@ -1,0 +1,55 @@
+<html>
+<head>
+</head>
+<body>
+    <script>
+
+        let connectToAnyServer = ()=>{
+          fetch('http://localhost:9081/servers/')
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(servers) {
+            let server = null;
+            for (k in servers){
+              if (k.indexOf(':9081')===-1){
+                console.log("-> server ->", k)
+                server = k;
+              }
+            }
+            connectToServer(server)
+          });
+
+        }
+
+        let connectToServer = (serverUrl)=>{
+          console.log("connecting to -> ", serverUrl)
+          var ws = new WebSocket(serverUrl);
+          var msg = "hi, this is simple message.";
+          ws.onopen = function(evt) {
+            ws.send(msg);
+          };
+
+          ws.onmessage = function(evt) {
+            // handle this message
+            console.log(evt.data);
+          };
+          ws.onclose = function(evt) {
+            console.log("onclose", evt)
+            console.log("retrying connect")
+            setTimeout(()=>{
+              connectToAnyServer()
+            }, 3500)
+          };
+          ws.onerror = function(evt) {
+              console.log("onerror", evt)
+          };
+
+        }
+
+        connectToAnyServer();
+
+
+    </script>
+</body>
+</html>
