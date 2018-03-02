@@ -58,7 +58,7 @@ public class EventServer
 
         context.setWelcomeFiles(new String[] { "client.html" });
 
-        ServletHolder holderEvents = new ServletHolder("ws-events", new EventServlet(rooms));
+        ServletHolder holderEvents = new ServletHolder("ws-events", new EventServlet(instance));
         context.addServlet(holderEvents, "/events/*");
 
         ServletHolder holder = new ServletHolder(new ServersServlet(servers));
