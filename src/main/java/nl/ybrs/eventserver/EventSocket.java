@@ -1,5 +1,6 @@
 package nl.ybrs.eventserver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
@@ -11,11 +12,12 @@ import java.util.Map;
 
 public class EventSocket extends WebSocketAdapter
 {
-    private final Map<String, Integer> rooms;
+    private final IMap<String, RoomState> rooms;
     private final HazelcastInstance hzInstance;
     private RoomMessageListener listener;
     private ITopic<Object> topic;
     private String messageListenerName;
+    private String roomname;
 
     public EventSocket(HazelcastInstance hzInstance){
         this.hzInstance = hzInstance;
@@ -23,24 +25,43 @@ public class EventSocket extends WebSocketAdapter
         System.out.println(rooms);
     }
 
+
+
+    public void sendRoomState(){
+        RoomState rs = this.rooms.get(this.roomname);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            this.getSession().getRemote().sendString(objectMapper.writeValueAsString(rs));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void joinRoom(String roomname){
+        this.roomname = "room1";
+        this.topic = hzInstance.getTopic(this.roomname);
+        this.listener = new RoomMessageListener(this);
+        this.messageListenerName = topic.addMessageListener(this.listener);
+        topic.publish("user joined " + this.roomname);
+        this.sendRoomState();
+
+        rooms.addEntryListener(new RoomMapEntryListener(this), this.roomname, false);
+    }
+
     @Override
     public void onWebSocketConnect(Session sess)
     {
         super.onWebSocketConnect(sess);
-
-        this.topic = hzInstance.getTopic( "room1" );
-        this.listener = new RoomMessageListener();
-        this.messageListenerName = topic.addMessageListener(this.listener);
-        topic.publish("user joined room1");
-
-        Integer value = this.rooms.get("room1");
-        this.rooms.put("room1", value+1);
         System.out.println("Socket Connected: " + sess);
-        try {
-            this.getSession().getRemote().sendString("current value:" + this.rooms.get("room1").toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    }
+
+    public void incrScore(){
+        rooms.lock(this.roomname);
+        RoomState rs = this.rooms.get(this.roomname);
+        rs.incrScore();
+        rooms.put(this.roomname, rs);
+        rooms.unlock(this.roomname);
+        topic.publish("STATE_UPDATE");
     }
 
     @Override
@@ -48,10 +69,15 @@ public class EventSocket extends WebSocketAdapter
     {
         super.onWebSocketText(message);
         System.out.println("Received TEXT message: " + message);
-        try {
-            this.getSession().getRemote().sendString(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (message.equals("JOIN_ROOM")){
+            this.joinRoom("room1"); // for simplicity sake, we are always joining room1
+        }
+
+        if (message.equals("INCR_SCORE")){
+            if (this.roomname == null){
+                return; // should give error
+            }
+            this.incrScore();
         }
     }
 

@@ -32,11 +32,10 @@ public class EventServer
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
+            response.addHeader("Access-Control-Allow-Origin", "*");
             response.setContentType("text/html");
             response.setStatus(HttpServletResponse.SC_OK);
-//            System.out.print(servers.toArray());
             ObjectMapper objectMapper = new ObjectMapper();
-
             response.getWriter().println(objectMapper.writeValueAsString(this.servers));
         }
     }
@@ -44,8 +43,9 @@ public class EventServer
     public static void main(String[] args) {
         Config cfg = new Config();
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(cfg);
-        IMap<String, Integer> rooms = instance.getMap("rooms");
-        rooms.putIfAbsent("room1", 0);
+        IMap<String, RoomState> rooms = instance.getMap("rooms");
+        rooms.putIfAbsent("room1", new RoomState("room1"));
+
         IMap<String, Integer> servers = instance.getMap("servers");
 
         Server server = new Server();
