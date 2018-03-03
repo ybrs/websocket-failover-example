@@ -48,16 +48,16 @@ class Client extends Component {
   }
 
   onOpen(evt){
-    this.setState({networkState: 'CONNECTED:'+this.serverUrl})
+    this.setState({networkState: 'CONNECTED'})
     this.ws.send("JOIN_ROOM")
   }
 
   onClose(evt){
-    this.setState({networkState: 'DISCONNECTED:'+this.serverUrl})
+    this.setState({networkState: 'DISCONNECTED'})
   }
 
   onMessage(evt){
-    console.log("message:", evt.data);
+    console.log("message:", this.serverUrl, evt.data);
     try {
       let d = JSON.parse(evt.data)
       this.setState({score: d.score})
@@ -90,31 +90,42 @@ class Client extends Component {
     this.ws.onerror = this.onError;
 }
 
+
   render(){
     return <div>
-      <div id="score">{this.state.score}</div>
+      <div id="score">
+      <h1>{this.props.name}</h1>
+      Score:{this.state.score}</div>
       <button onClick={this.incrScore}>Incr Score</button>|
-      <button onClick={this.closeWebsocket}>Close Socket</button>|
-      <button onClick={this.reconnect}>reconnect</button>|
-
-      <div id="state">{this.state.networkState}</div>
+      <ConnectButton networkState={this.state.networkState}
+        reconnect={this.reconnect}
+        closeWebsocket={this.closeWebsocket}
+      />
+      <div id="state">{this.state.networkState} | {this.serverUrl}</div>
     </div>
   }
 }
 
+let ConnectButton = ({networkState, reconnect, closeWebsocket})=>{
+  if (networkState === 'DISCONNECTED'){
+    return <button onClick={reconnect}>reconnect</button>
+  }
+
+  return <button onClick={closeWebsocket}>Close Socket</button>
+}
 
 class App extends Component {
   render() {
     return (
       <div className="App">
 
-        <Client socketUrl="ws://localhost:9081/events/" />
+        <Client name="client1" socketUrl="ws://localhost:9081/events/" />
         <hr/>
-        <Client socketUrl="ws://localhost:9082/events/" />
+        <Client name="client2" socketUrl="ws://localhost:9082/events/" />
         <hr/>
-        <Client socketUrl="ws://localhost:9083/events/" />
-
-        {/* <Client socketUrl="" /> */}
+        <Client name="client3" socketUrl="ws://localhost:9083/events/" />
+        <hr/>
+        <Client name="client4 random" socketUrl="" />
 
       </div>
     );

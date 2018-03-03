@@ -82,7 +82,7 @@ public class EventServer
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    Integer p = servers.putIfAbsent("ws://localhost:" + args[0] + "/events/", 1, 3, TimeUnit.SECONDS);
+                    Integer p = servers.put("ws://localhost:" + args[0] + "/events/", 1, 5, TimeUnit.SECONDS);
                 }
             }, 1 * 1000, 1 * 1000);
 
