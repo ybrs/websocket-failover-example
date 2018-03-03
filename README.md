@@ -1,11 +1,13 @@
-# websocket-failover-example
-this is a simple websocket failover example with jetty and hazelcast.
+# High Available websocket example
 
-What it does is, you spawn 3 (or more) websocket servers, clients connects to any of them. 
+This is a simple websocket failover/high availability example with jetty and hazelcast.
 
-We hold a simple integer and increment when client presses a button. 
+What it does is, you spawn 3 (or more) websocket servers, clients connect to any of them. 
 
-Clients can disconnect and reconnect to any of the available websockets, and you can see the counter still has the same value.
+We hold a simple integer and increment when client presses a button. Think that as a session/room/game data.
+
+Clients can disconnect and reconnect to any of the available websockets, 
+and you can see the counter still has the same value.
 
 
 What ?
@@ -27,15 +29,15 @@ How it works
 ```
 - on the same terminal, run server 
 ```
-java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 9081
+java -jar target//nl.ybrs.eventserver-1.0-SNAPSHOT-jar-with-dependencies.jar 9081
 ```
 - on another terminal
 ```
-java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 9082
+java -jar target//nl.ybrs.eventserver-1.0-SNAPSHOT-jar-with-dependencies.jar 9082
 ```
 - on another terminal
 ```
-java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 9083
+java -jar target//nl.ybrs.eventserver-1.0-SNAPSHOT-jar-with-dependencies.jar 9083
 ```
 
 - now you have 3 servers, leave them running
@@ -47,14 +49,33 @@ java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 
 - you can try, disconnecting, reconnecting, killing any of the servers etc. The room/session data is in the grid. 
 So unless you kill all servers and restart, your room data will be available.
 
+- for building the frontend, you can 
+```
+cd public/frontend
+yarn build
+```
+
+- or to experiment with the client side,
+```
+cd public/frontend
+yarn start
+```
 
 What now
 ------------
 This is simply a starting point to explore the possibilities using a datagrid with java websockets. 
 
 
-
 How it works in detail:
 ------------------------
 
-Todo:
+There are a few topics to be explained.
+
+1- Loadbalancing, service discovery
+
+This part is how a client will understand which server to connect etc. Keeping a list of available servers etc.
+
+2- Session data
+
+This is about how to access session data from any server.
+
