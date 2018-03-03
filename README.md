@@ -1,8 +1,22 @@
 # websocket-failover-example
 this is a simple websocket failover example with jetty and hazelcast.
 
-What it does is, you spawn 3 (or more) websocket servers, client connects to any of them. We hold a simple integer and increment
-when the client connects. Client disconnects and connects to any of the available websockets, and you see the counter is still incrementing.
+What it does is, you spawn 3 (or more) websocket servers, clients connects to any of them. 
+
+We hold a simple integer and increment when client presses a button. 
+
+Clients can disconnect and reconnect to any of the available websockets, and you can see the counter still has the same value.
+
+
+What ?
+-------------------------
+
+![screencast](screencast.gif)
+
+You can see we have 4 clients, connecting to each websocket server. Incrementing the counter on any port is published almost realtime
+to other websocket clients.
+
+The 4th client connects to one of the servers randomly.
 
 How it works
 -------------------------
@@ -24,26 +38,15 @@ java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 
 java -jar target/javax.websocket-example-1.0-SNAPSHOT-jar-with-dependencies.jar 9083
 ```
 
-- now you have 3 servers, client will connect to only 9082 or 9083
+- now you have 3 servers, leave them running
+
 - open chrome and access http://localhost:9081/
-- on chrome dev console you'll see the output like
-```
-connecting to ->  ws://localhost:9082/events/
-current value:1
-```
-- refresh your browser and you'll see output like
-```
-connecting to ->  ws://localhost:9083/events/
-current value:2
-```
-- now you can kill server on 9083, you'll see something like
-```
-onclose CloseEvent {isTrusted: true, wasClean: false, code: 1006, reason: "", type: "close", …}
-retrying connect
--> server -> ws://localhost:9082/events/
-connecting to ->  ws://localhost:9082/events/
-current value:27
-```
+
+- on chrome dev console you'll see a similar ui like the one on the image above
+
+- you can try, disconnecting, reconnecting, killing any of the servers etc. The room/session data is in the grid. 
+So unless you kill all servers and restart, your room data will be available.
+
 
 What now
 ------------
@@ -51,4 +54,7 @@ This is simply a starting point to explore the possibilities using a datagrid wi
 
 
 
+How it works in detail:
+------------------------
 
+Todo:

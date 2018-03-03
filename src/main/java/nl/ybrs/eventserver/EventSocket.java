@@ -18,6 +18,7 @@ public class EventSocket extends WebSocketAdapter
     private ITopic<Object> topic;
     private String messageListenerName;
     private String roomname;
+    private String mapListenerName;
 
     public EventSocket(HazelcastInstance hzInstance){
         this.hzInstance = hzInstance;
@@ -45,7 +46,7 @@ public class EventSocket extends WebSocketAdapter
         topic.publish("user joined " + this.roomname);
         this.sendRoomState();
 
-        rooms.addEntryListener(new RoomMapEntryListener(this), this.roomname, false);
+        this.mapListenerName = rooms.addEntryListener(new RoomMapEntryListener(this), this.roomname, false);
     }
 
     @Override
@@ -86,6 +87,7 @@ public class EventSocket extends WebSocketAdapter
     {
         super.onWebSocketClose(statusCode,reason);
         topic.removeMessageListener(this.messageListenerName);
+        rooms.removeEntryListener(this.mapListenerName);
         System.out.println("Socket Closed: [" + statusCode + "] " + reason);
     }
 
