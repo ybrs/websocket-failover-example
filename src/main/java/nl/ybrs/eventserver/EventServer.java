@@ -56,7 +56,7 @@ public class EventServer
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
 
-        context.setWelcomeFiles(new String[] { "client.html" });
+        context.setWelcomeFiles(new String[] { "index.html" });
 
         ServletHolder holderEvents = new ServletHolder("ws-events", new EventServlet(instance));
         context.addServlet(holderEvents, "/events/*");
@@ -66,7 +66,7 @@ public class EventServer
 
         ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
         staticHolder.setInitParameter("pathInfoOnly", "true");
-        staticHolder.setInitParameter("resourceBase", "./public");
+        staticHolder.setInitParameter("resourceBase", "./public/frontend/build");
         staticHolder.setInitParameter("dirAllowed","true");
         context.addServlet(staticHolder, "/*");
 
