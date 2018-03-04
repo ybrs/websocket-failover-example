@@ -76,7 +76,6 @@ public class EventServer
 
         server.setHandler(context);
 
-
         try {
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {

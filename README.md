@@ -71,11 +71,26 @@ How it works in detail:
 
 There are a few topics to be explained.
 
+0- Background High Availability
+
+Just a brief overview, about architecture what we use etc.
+
+[Architecture](Architecture.md)
+
 1- Loadbalancing, service discovery
 
 This part is how a client will understand which server to connect etc. Keeping a list of available servers etc.
 
+[LoadBalancing](LoadBalancing.md)
+
 2- Session data
 
-This is about how to access session data from any server.
+This is about how to access session data from any server. Keeping data on the grid.
 
+[SessionData](SessionData.md)
+
+3- Publishing and listening events in the cluster
+
+This part is about how you can publish events - eg: user joined, data updated etc. and how you can react accordingly
+
+[EventPublishing](EventPublishing.md)
